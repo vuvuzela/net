@@ -245,6 +245,12 @@ type Message struct {
 	N     int // # of bytes read or written from/to Buffers
 	NN    int // # of bytes read or written from/to OOB
 	Flags int // protocol-specific information on the received message
+
+	vs []iovec
+}
+
+func (m *Message) Init() {
+	m.vs = make([]iovec, len(m.Buffers))
 }
 
 // RecvMsg wraps recvmsg system call.

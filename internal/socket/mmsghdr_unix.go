@@ -12,7 +12,7 @@ type mmsghdrs []mmsghdr
 
 func (hs mmsghdrs) pack(ms []Message, parseFn func([]byte, string) (net.Addr, error), marshalFn func(net.Addr) []byte) error {
 	for i := range hs {
-		vs := make([]iovec, len(ms[i].Buffers))
+		vs := ms[i].vs
 		var sa []byte
 		if parseFn != nil {
 			sa = make([]byte, sizeofSockaddrInet6)
