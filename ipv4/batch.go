@@ -11,6 +11,8 @@ import (
 	"golang.org/x/net/internal/socket"
 )
 
+const BatchSize = socket.MmsgBatchSize
+
 // BUG(mikio): On Windows, the ReadBatch and WriteBatch methods of
 // PacketConn are not implemented.
 

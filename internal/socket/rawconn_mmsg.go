@@ -9,11 +9,25 @@ package socket
 import (
 	"net"
 	"os"
+	"sync"
 	"syscall"
 )
 
+// TODO: what is an optimal batch size?
+const MmsgBatchSize int = 128
+
+var mmsghdrsPool = &sync.Pool{
+	New: func() interface{} {
+		hs := make(mmsghdrs, MmsgBatchSize)
+		return hs
+	},
+}
+
 func (c *Conn) recvMsgs(ms []Message, flags int) (int, error) {
-	hs := make(mmsghdrs, len(ms))
+	hs := mmsghdrsPool.Get().(mmsghdrs)
+	defer mmsghdrsPool.Put(hs[:MmsgBatchSize])
+	hs = hs[:len(ms)]
+
 	var parseFn func([]byte, string) (net.Addr, error)
 	if c.network != "tcp" {
 		// XXX disable parsing to reduce allocations
@@ -44,7 +58,10 @@ func (c *Conn) recvMsgs(ms []Message, flags int) (int, error) {
 }
 
 func (c *Conn) sendMsgs(ms []Message, flags int) (int, error) {
-	hs := make(mmsghdrs, len(ms))
+	hs := mmsghdrsPool.Get().(mmsghdrs)
+	defer mmsghdrsPool.Put(hs[:MmsgBatchSize])
+	hs = hs[:len(ms)]
+
 	var marshalFn func(net.Addr) []byte
 	if c.network != "tcp" {
 		//marshalFn = marshalInetAddr

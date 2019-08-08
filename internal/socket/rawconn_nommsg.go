@@ -6,6 +6,8 @@
 
 package socket
 
+const MmsgBatchSize = 1
+
 func (c *Conn) recvMsgs(ms []Message, flags int) (int, error) {
 	return 0, errNotImplemented
 }
