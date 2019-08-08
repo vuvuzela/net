@@ -16,7 +16,8 @@ func (c *Conn) recvMsgs(ms []Message, flags int) (int, error) {
 	hs := make(mmsghdrs, len(ms))
 	var parseFn func([]byte, string) (net.Addr, error)
 	if c.network != "tcp" {
-		parseFn = parseInetAddr
+		// XXX disable parsing to reduce allocations
+		//parseFn = parseInetAddr
 	}
 	if err := hs.pack(ms, parseFn, nil); err != nil {
 		return 0, err
@@ -46,7 +47,7 @@ func (c *Conn) sendMsgs(ms []Message, flags int) (int, error) {
 	hs := make(mmsghdrs, len(ms))
 	var marshalFn func(net.Addr) []byte
 	if c.network != "tcp" {
-		marshalFn = marshalInetAddr
+		//marshalFn = marshalInetAddr
 	}
 	if err := hs.pack(ms, nil, marshalFn); err != nil {
 		return 0, err
